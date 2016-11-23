@@ -1,0 +1,18 @@
+# search for target, fail if not found
+- name: checking for {{count}} running {{pod}} pods
+  command: /usr/bin/env bash -c 'oc get pods -n default | grep -E "^{{pod}}" | grep Running'
+  register: pods_running
+  changed_when: "{{pods_running.stdout_lines | count}} != {{count}}"
+  failed_when: false
+  ignore_errors: true
+
+- name: checking all {{pod}} pods
+  command: /usr/bin/env bash -c 'oc get pods -n default | grep -E "^{{pod}}"'
+  register: pods_found
+  failed_when: false
+  ignore_errors: true
+  when: pods_running.changed
+
+- name: debug all {{pod}} pods
+  debug: var=pods_found
+  when: pods_running.changed

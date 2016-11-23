@@ -1,0 +1,56 @@
+# search for my labels on primary, fail if not found
+
+- name: oc get nodes --show-labels | grep ec2_private_dns_name
+  command: /usr/bin/env bash -c 'oc get nodes --show-labels | grep {{ec2_private_dns_name}}'
+  register: labels
+  delegate_to: "{{ groups['oo_master_primary'] | intersect(groups['oo_clusterid_' + oo_clusterid]) | first }}"
+  changed_when: false
+
+- name: status must be Ready,SchedulingDisabled
+  #debug: var=labels
+  fail: msg="status must be Ready,SchedulingDisabled"
+  ignore_errors: true
+  when:
+  - (oo_hosttype == "master")
+  - labels.stdout.find('Ready,SchedulingDisabled') == -1
+
+- name: status must be Ready
+  #debug: var=labels
+  fail: msg="status must be Ready"
+  ignore_errors: true
+  when:
+  - (oo_hosttype == "node")
+  - labels.stdout.find('Ready') == -1
+
+- name: labels must have region
+  #debug: var=labels
+  fail: msg="labels must have region"
+  ignore_errors: true
+  when:
+  - labels.stdout.find('region=') == -1
+
+- name: labels must have type=master
+  #debug: var=labels
+  fail: msg="labels must have type=master"
+  ignore_errors: true
+  when:
+  - (oo_hosttype == "master")
+  - labels.stdout.find('type=master') == -1
+
+- name: labels must have type=infra
+  #debug: var=labels
+  fail: msg="labels must have type=infra"
+  ignore_errors: true
+  when:
+  - (oo_hosttype == "node")
+  - (oo_subhosttype == "infra")
+  - labels.stdout.find('type=infra') == -1
+
+- name: labels must have type=compute
+  #debug: var=labels
+  fail: msg="labels must have type=compute"
+  ignore_errors: true
+  when:
+  - (oo_hosttype == "node")
+  - (oo_subhosttype == "compute")
+  - labels.stdout.find('type=compute') == -1

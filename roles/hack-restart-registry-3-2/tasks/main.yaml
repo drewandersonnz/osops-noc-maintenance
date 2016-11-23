@@ -1,0 +1,10 @@
+- name: "search for {{target}}, fail if not found"
+  command: /bin/bash -c "rpm -qa | grep {{target}}"
+  register: target_found
+  changed_when: target_found.rc == 0
+  failed_when: false
+  ignore_errors: true
+
+- name: "restart registry on hosts with {{target}}"
+  command: /bin/bash -c "oc scale --replicas 0 -n default dc/docker-registry; oc scale --replicas 2 -n default dc/docker-registry;"
+  when: target_found.changed

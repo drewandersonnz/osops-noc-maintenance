@@ -1,0 +1,9 @@
+# search for target, fail if not found
+- command: docker exec -i {{container}} date
+  register: container_running
+  changed_when: container_running.rc != 0
+  failed_when: false
+  ignore_errors: true
+
+- debug: var=container_running
+  when: container_running.changed

@@ -1,0 +1,36 @@
+#!/usr/bin/ansible-playbook
+###########################
+- hosts: oo_version_3:&tag_environment_prod
+  remote_user: root
+
+  roles:
+  - {role: monitoring-container,
+        container: oso-rhel7-host-monitoring
+    }
+
+  - {role: oc-node-labels,
+        when: (oo_hosttype == "master") or (oo_hosttype == "node"),
+    }
+
+###########################
+- hosts: oo_version_3:&tag_environment_prod:&oo_master_primary
+  remote_user: root
+
+  vars:
+    allowChanges: true
+
+  roles:
+  - {role: oc-infra-services,
+        pod: router,
+        count: 2,
+    }
+
+  - {role: oc-infra-services,
+        pod: docker-registry,
+        count: 2,
+    }
+
+  - {role: hack-restart-registry-3-2,
+        target: atomic-openshift-master-3.2.1.17-1.git.0.6d01b60.el7.x86_64,
+        when: allowChanges
+    }
