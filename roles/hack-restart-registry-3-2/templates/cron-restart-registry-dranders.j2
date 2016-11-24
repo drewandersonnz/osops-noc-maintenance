@@ -1,0 +1,4 @@
+#!/usr/bin/env /bin/bash
+
+/usr/bin/oc scale --replicas 0 -n default dc/docker-registry;
+/usr/bin/oc scale --replicas 2 -n default dc/docker-registry;

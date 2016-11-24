@@ -5,6 +5,39 @@
   failed_when: false
   ignore_errors: true
 
+# if valid, do it now
+
 - name: "restart registry on hosts with {{target}}"
   command: /bin/bash -c "oc scale --replicas 0 -n default dc/docker-registry; oc scale --replicas 2 -n default dc/docker-registry;"
   when: target_found.changed
+
+# if valid, install cron (cron name must match below)
+
+- name: "cron restart registry on hosts that fail"
+  cron:
+    minute="29,59"
+    state=present
+    job="/tmp/cron-restart-registry-dranders"
+  when: target_found.changed
+
+- name: "cp /tmp/cron-restart-registry-dranders"
+  template:
+    src=cron-restart-registry-dranders.j2
+    dest=/tmp/cron-restart-registry-dranders
+    owner=root
+    group=root
+    mode=0755
+  when: target_found.changed
+
+# if no longer valid, remove cron (cron name must match above)
+
+- name: "cron restart registry on hosts that fail"
+  cron:
+    state=absent
+  when: not target_found.changed
+
+- name: "rm /tmp/cron-restart-registry-dranders"
+  file:
+    dest=/tmp/cron-restart-registry-dranders
+    state=absent
+  when: not target_found.changed
