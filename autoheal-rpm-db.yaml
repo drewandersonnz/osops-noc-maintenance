@@ -1,0 +1,28 @@
+#!/usr/bin/ansible-playbook
+###########################
+- hosts: oo_version_3
+  remote_user: root
+  gather_facts: false
+
+  vars:
+    allowChanges: false
+
+  tasks:
+
+  - name: "check if rpm db is ok"
+    command: /bin/bash -c "rpm -qa"
+    changed_when: (confirm_rpm_db_is_ok.rc != 0) and ("DB_RUNRECOVERY" in confirm_rpm_db_is_ok.stderr)
+    failed_when: false
+    register: confirm_rpm_db_is_ok
+
+  - name: "rpm db is not ok, show error"
+    debug: var=confirm_rpm_db_is_ok
+    when: confirm_rpm_db_is_ok.changed
+
+  - name: "[autoheal] removing rpm db files"
+    command: /bin/bash -c "rm -f /var/lib/rpm/__db*"
+    when: allowChanges and confirm_rpm_db_is_ok.changed
+
+  - name: "[autoheal] rebuilding rpm db files"
+    command: /bin/bash -c "rpm --rebuilddb"
+    when: allowChanges and confirm_rpm_db_is_ok.changed
