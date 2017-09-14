@@ -5,7 +5,7 @@
   gather_facts: false
 
   vars:
-    allowChanges: false
+    allowChanges: true
 
   tasks:
 
