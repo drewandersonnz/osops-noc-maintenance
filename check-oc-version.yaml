@@ -1,10 +1,11 @@
 #!/usr/bin/ansible-playbook
 ###########################
-- hosts: oo_version_3:&oo_environment_prod:&oo_master_primary
+- hosts: oo_version_3:&oo_environment_prod
   gather_facts: false
   remote_user: root
+  serial: 20
 
-  roles:
-  - {role: check-oc-version,
-        require_oc_version: '(3.9.41)',
-    }
+  tasks:
+  - name: check-oc-version
+    include_role:
+      name: check-oc-version

@@ -5,7 +5,6 @@
   remote_user: root
   serial: 20
 
-
   tasks:
   - name: check-kernel-version
     include_role:
