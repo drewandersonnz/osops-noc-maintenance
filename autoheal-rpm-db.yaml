@@ -3,6 +3,7 @@
 - hosts: oo_version_3
   remote_user: root
   gather_facts: false
+  serial: 20
 
   vars:
     allowChanges: true
