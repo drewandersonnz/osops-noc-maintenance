@@ -1,0 +1,12 @@
+#!/usr/bin/ansible-playbook
+###########################
+- hosts: oo_version_3:&oo_environment_prod
+  gather_facts: false
+  remote_user: root
+  serial: 20
+
+
+  tasks:
+  - name: check-kernel-version
+    include_role:
+      name: check-kernel-version

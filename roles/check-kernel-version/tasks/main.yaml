@@ -1,0 +1,4 @@
+# search for target, fail if not found
+- name: require kernel version v{{require_kernel_version}}
+  command: /usr/bin/env bash -c 'uname -r | grep -E "^{{ require_kernel_version }}"'
+  changed_when: false
