@@ -1,0 +1,4 @@
+# search for target, fail if not found
+- name: check for non-green status
+  command: /usr/bin/env bash -c "oc exec -n logging $(oc get pods -n logging | grep logging-es-data-master | grep Running | grep '2/2' | head -1 | awk '{print $1}') -- health | grep logging-es | grep green"
+  changed_when: false
