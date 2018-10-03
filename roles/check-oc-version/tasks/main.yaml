@@ -1,0 +1,4 @@
+# search for target, fail if not found
+- name: require oc version v{{require_oc_version}}
+  command: /usr/bin/env bash -c 'oc version | grep -E "^oc v{{ require_oc_version }}"'
+  changed_when: false
